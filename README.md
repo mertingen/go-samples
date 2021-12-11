@@ -6,3 +6,35 @@ It basically handles CRUD operations in Go. I find the following topics importan
 
 - Gorilla Mux Routing
 - Gracefully Shutdown
+
+First thing is creating a network for Docker with the following command.
+
+```
+docker create network samples-crud
+```
+
+
+There are 2 containers such as crud-app and mysql-database.
+
+ -- Run this command to start app container.
+```
+ docker run -d -it \
+     -p8000:8000 \
+     --network samples-crud \
+     -e MYSQL_HOST=mysql \
+     -e MYSQL_USER=root \
+     -e MYSQL_PASSWORD=secret \
+     -e MYSQL_DB=crud \
+   samples-crud
+ ```
+
+-- Run this command to start mysql db container.
+
+```
+docker run -d \
+     --network samples-crud --network-alias mysql \
+     -v todo-mysql-data:/var/lib/mysql \
+     -e MYSQL_ROOT_PASSWORD=secret \
+     -e MYSQL_DATABASE=crud \
+     mysql:5.7
+```
