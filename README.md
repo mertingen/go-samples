@@ -4,6 +4,7 @@ I'd like to share random apps in the spare times. Thus, I'm going to try learnin
 ## crud
 It basically handles CRUD operations in Go. I find the following topics important. Thus, I can refer to this app to get a reference for them.
 
+- Migration
 - Gorilla Mux Routing
 - Gracefully Shutdown
 
@@ -27,6 +28,15 @@ There are 2 containers such as crud-app and mysql-database.
      -e MYSQL_DB=crud \
    samples-crud
  ```
+
+-- Run this command to start migration container.
+```
+docker run --rm \
+	--network samples-crud \
+	migrator \
+	--path=migrations/ \
+	-database "mysql://root:secret@tcp(mysql)/crud" up
+```
 
 -- Run this command to start mysql db container.
 
