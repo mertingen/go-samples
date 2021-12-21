@@ -35,7 +35,8 @@ func main() {
 	}(db)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", handlers.Home)
+	//specify endpoints, handler functions and HTTP method
+	r.HandleFunc("/health", handlers.Health).Methods("GET")
 	http.Handle("/", r)
 
 	srv := &http.Server{

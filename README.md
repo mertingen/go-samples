@@ -17,6 +17,45 @@ docker create network samples-crud
 
 There are 2 containers such as crud-app and mysql-database.
 
+-- Run this command to start mysql db container.
+
+```
+docker run -d \
+     --network samples-crud --network-alias mysql \
+     -v todo-mysql-data:/var/lib/mysql \
+     -e MYSQL_ROOT_PASSWORD=secret \
+     -e MYSQL_DATABASE=crud \
+     mysql:5.7
+```
+
+-- Build migrator image in /migrator directory by Dockerfile.
+```
+docker build -t migrator .
+```
+
+-- Run this command to start migration container to UP.
+```
+docker run --rm \
+	--network samples-crud \
+	migrator \
+	--path=migrations/ \
+	-database "mysql://root:secret@tcp(mysql)/crud" up
+```
+
+-- Run this command to start migration container to DOWN.
+```
+docker run --rm \
+	--network samples-crud \
+	migrator \
+	--path=migrations/ \
+	-database "mysql://root:secret@tcp(mysql)/crud" down --all
+```
+
+-- Build app image in root directory by Dockerfile.
+```
+docker build -t samples-crud .
+```
+
  -- Run this command to start app container.
 ```
  docker run -d -it \
@@ -28,23 +67,3 @@ There are 2 containers such as crud-app and mysql-database.
      -e MYSQL_DB=crud \
    samples-crud
  ```
-
--- Run this command to start migration container.
-```
-docker run --rm \
-	--network samples-crud \
-	migrator \
-	--path=migrations/ \
-	-database "mysql://root:secret@tcp(mysql)/crud" up
-```
-
--- Run this command to start mysql db container.
-
-```
-docker run -d \
-     --network samples-crud --network-alias mysql \
-     -v todo-mysql-data:/var/lib/mysql \
-     -e MYSQL_ROOT_PASSWORD=secret \
-     -e MYSQL_DATABASE=crud \
-     mysql:5.7
-```
