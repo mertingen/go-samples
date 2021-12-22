@@ -13,6 +13,24 @@ func NewStudent(db *sql.DB) Student {
 	return Student{db: db}
 }
 
+func (s *Student) FetchOneById(id int64) (models.Student, error) {
+	student := models.Student{}
+
+	err := s.db.QueryRow("SELECT * FROM students WHERE id=?", id).Scan(
+		&student.Id,
+		&student.Fullname,
+		&student.Email,
+		&student.Age)
+
+	//if there is no row, it shouldn't give an error
+	//thus "sql.ErrNoRows" is added
+	if err != sql.ErrNoRows && err != nil {
+		return student, err
+	}
+
+	return student, nil
+}
+
 func (s *Student) FetchOneByEmail(email string) (models.Student, error) {
 	student := models.Student{}
 

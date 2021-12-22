@@ -44,8 +44,9 @@ func main() {
 	r := mux.NewRouter()
 	//specify endpoints, handler functions and HTTP method
 	r.HandleFunc("/health", handlers.Health).Methods("GET")
+	r.HandleFunc("/students/{id}", studentHandler.FetchOne).Methods("GET")
 	r.HandleFunc("/students", studentHandler.Insert).Methods("POST")
-	r.HandleFunc("/students", studentHandler.Update).Methods("PUT")
+	r.HandleFunc("/students/{id}", studentHandler.Update).Methods("PUT")
 	http.Handle("/", r)
 
 	srv := &http.Server{
