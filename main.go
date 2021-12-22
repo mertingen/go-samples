@@ -45,6 +45,7 @@ func main() {
 	//specify endpoints, handler functions and HTTP method
 	r.HandleFunc("/health", handlers.Health).Methods("GET")
 	r.HandleFunc("/students", studentHandler.Insert).Methods("POST")
+	r.HandleFunc("/students", studentHandler.Update).Methods("PUT")
 	http.Handle("/", r)
 
 	srv := &http.Server{
