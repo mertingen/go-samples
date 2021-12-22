@@ -19,16 +19,81 @@ func NewStudent(studentService services.Student) Student {
 	return Student{studentService: studentService}
 }
 
-func (s *Student) FetchOne(w http.ResponseWriter, r *http.Request) {
+func (s *Student) Delete(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id := params["id"]
+	strId := params["id"]
 
 	//it converts string to int64
-	intId, err := strconv.ParseInt(id, 10, 64)
+	id, err := strconv.ParseInt(strId, 10, 64)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	student, err := s.studentService.FetchOneById(intId)
+	student, err := s.studentService.FetchOneById(id)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	//update content type
+	w.Header().Set("Content-Type", "application/json")
+
+	//specify HTTP status code
+	w.WriteHeader(http.StatusOK)
+
+	if (models.Student{}) == student {
+		resp := make(map[string]string)
+		resp["error"] = "Student is not found!"
+
+		//convert struct to JSON
+		jsonResponse, err := json.Marshal(resp)
+		if err != nil {
+			return
+		}
+
+		//update response
+		_, err = w.Write(jsonResponse)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		return
+	}
+
+	err = s.studentService.Delete(id)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	//update content type
+	w.Header().Set("Content-Type", "application/json")
+
+	//specify HTTP status code
+	w.WriteHeader(http.StatusOK)
+
+	resp := make(map[string]bool)
+	resp["status"] = true
+
+	//convert struct to JSON
+	jsonResponse, err := json.Marshal(resp)
+	if err != nil {
+		return
+	}
+
+	//update response
+	_, err = w.Write(jsonResponse)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func (s *Student) FetchOne(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	strId := params["id"]
+
+	//it converts string to int64
+	id, err := strconv.ParseInt(strId, 10, 64)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	student, err := s.studentService.FetchOneById(id)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -85,15 +150,15 @@ func (s *Student) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := mux.Vars(r)
-	id := params["id"]
+	strId := params["id"]
 
 	//it converts string to int64
-	intId, err := strconv.ParseInt(id, 10, 64)
+	id, err := strconv.ParseInt(strId, 10, 64)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	isExist, err := s.studentService.FetchOneById(intId)
+	isExist, err := s.studentService.FetchOneById(id)
 	if err != nil {
 		log.Fatalln(err)
 	}

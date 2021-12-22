@@ -13,6 +13,22 @@ func NewStudent(db *sql.DB) Student {
 	return Student{db: db}
 }
 
+func (s *Student) Delete(id int64) error {
+	stmt, err := s.db.Prepare("DELETE FROM students WHERE id=?")
+
+	// if there is an error, handle it
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *Student) FetchOneById(id int64) (models.Student, error) {
 	student := models.Student{}
 

@@ -47,6 +47,7 @@ func main() {
 	r.HandleFunc("/students/{id}", studentHandler.FetchOne).Methods("GET")
 	r.HandleFunc("/students", studentHandler.Insert).Methods("POST")
 	r.HandleFunc("/students/{id}", studentHandler.Update).Methods("PUT")
+	r.HandleFunc("/students/{id}", studentHandler.Delete).Methods("DELETE")
 	http.Handle("/", r)
 
 	srv := &http.Server{
