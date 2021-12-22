@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/mertingen/go-samples/handlers"
+	"github.com/mertingen/go-samples/services"
 	"log"
 	"net/http"
 	"os"
@@ -16,14 +17,17 @@ import (
 )
 
 func main() {
-	mysqlConn := fmt.Sprintf("%s:%a@tcp(%s:3306)/%s", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_DB"))
+	mysqlConn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_DB"))
 	// Open up our database connection.
 	db, err := sql.Open("mysql", mysqlConn)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalln(err)
 	}
 
-	log.Println("Database is running...")
+	if err := db.Ping(); err != nil {
+		log.Fatalln(err)
+	}
+	log.Println("Database is up and running...")
 
 	// defer the close till after the main function has finished
 	// executing
@@ -34,9 +38,13 @@ func main() {
 		}
 	}(db)
 
+	studentService := services.NewStudent(db)
+	studentHandler := handlers.NewStudent(studentService)
+
 	r := mux.NewRouter()
 	//specify endpoints, handler functions and HTTP method
 	r.HandleFunc("/health", handlers.Health).Methods("GET")
+	r.HandleFunc("/students", studentHandler.Insert).Methods("POST")
 	http.Handle("/", r)
 
 	srv := &http.Server{
@@ -48,7 +56,7 @@ func main() {
 	}
 
 	go func() {
-		log.Println("Server is running...")
+		log.Println("Server is up and running...")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Listen: %s\n", err)
 		}
