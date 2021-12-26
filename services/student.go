@@ -29,6 +29,26 @@ func (s *Student) Delete(id int64) error {
 	return nil
 }
 
+func (s *Student) FetchAll() ([]models.Student, error) {
+	students := make([]models.Student, 0)
+	student := models.Student{}
+	rows, err := s.db.Query("SELECT * FROM students ORDER BY fullname")
+	if err != sql.ErrNoRows && err != nil {
+		return students, err
+	}
+	for rows.Next() {
+		err := rows.Scan(&student.Id,
+			&student.Fullname,
+			&student.Email,
+			&student.Age)
+		if err != nil {
+			return students, err
+		}
+		students = append(students, student)
+	}
+	return students, nil
+}
+
 func (s *Student) FetchOneById(id int64) (models.Student, error) {
 	student := models.Student{}
 

@@ -19,6 +19,34 @@ func NewStudent(studentService services.Student) Student {
 	return Student{studentService: studentService}
 }
 
+func (s *Student) FetchAll(w http.ResponseWriter, r *http.Request) {
+	students, err := s.studentService.FetchAll()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	//update content type
+	w.Header().Set("Content-Type", "application/json")
+
+	//specify HTTP status code
+	w.WriteHeader(http.StatusOK)
+
+	resp := make(map[string][]models.Student)
+	resp["data"] = students
+
+	//convert struct to JSON
+	jsonResponse, err := json.Marshal(resp)
+	if err != nil {
+		return
+	}
+
+	//update response
+	_, err = w.Write(jsonResponse)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
 func (s *Student) Delete(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	strId := params["id"]
@@ -61,12 +89,6 @@ func (s *Student) Delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	//update content type
-	w.Header().Set("Content-Type", "application/json")
-
-	//specify HTTP status code
-	w.WriteHeader(http.StatusOK)
 
 	resp := make(map[string]bool)
 	resp["status"] = true
@@ -156,6 +178,24 @@ func (s *Student) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(strId, 10, 64)
 	if err != nil {
 		log.Fatalln(err)
+	}
+	
+	if id != student.Id {
+		resp := make(map[string]string)
+		resp["error"] = "Ids are not matched!"
+
+		//convert struct to JSON
+		jsonResponse, err := json.Marshal(resp)
+		if err != nil {
+			return
+		}
+
+		//update response
+		_, err = w.Write(jsonResponse)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		return
 	}
 
 	isExist, err := s.studentService.FetchOneById(id)
