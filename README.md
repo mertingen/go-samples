@@ -56,7 +56,7 @@ docker run --rm \
 docker build -t samples-crud .
 ```
 
- -- Run this command to start app container.
+-- Run this command to start app container.
 ```
  docker run -d -it \
      -p8000:8000 \
@@ -65,5 +65,7 @@ docker build -t samples-crud .
      -e MYSQL_USER=root \
      -e MYSQL_PASSWORD=secret \
      -e MYSQL_DB=crud \
+     -e MYSQL_PORT=3306 \
+     -e APP_PORT=8000 \
    samples-crud
  ```

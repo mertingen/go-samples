@@ -17,22 +17,14 @@ import (
 )
 
 func main() {
-	mysqlConn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_DB"))
-	// Open up our database connection.
-	db, err := sql.Open("mysql", mysqlConn)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	if err := db.Ping(); err != nil {
-		log.Fatalln(err)
-	}
-	log.Println("Database is up and running...")
+	connInfo := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_PORT"), os.Getenv("MYSQL_DB"))
+	databaseServ := services.NewDatabase("mysql", connInfo)
+	db := databaseServ.Connect()
 
 	// defer the close till after the main function has finished
 	// executing
 	defer func(db *sql.DB) {
-		err = db.Close()
+		err := db.Close()
 		if err != nil {
 			log.Fatalf("Database close: %s\n", err)
 		}
@@ -53,7 +45,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler: r,
-		Addr:    ":8000",
+		Addr:    fmt.Sprintf(":%s", os.Getenv("APP_PORT")),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -79,7 +71,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// Don't block if no connections, otherwise wait until the timeout deadline.
-	err = srv.Shutdown(ctx)
+	err := srv.Shutdown(ctx)
 	if err != nil {
 		log.Fatalf("Shutdown: %s\n", err)
 	}
