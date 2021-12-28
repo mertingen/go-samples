@@ -1,13 +1,17 @@
 # go-samples
 I'd like to share random apps in the spare times. Thus, I'm going to try learning some concepts of Go and as much as I can I try to clarify each line.
 
-## crud
+## CRUD APP
 It basically handles CRUD operations in Go. I find the following topics important. Thus, I can refer to this app to get a reference for them.
 
+- Dockerfiles, Containers and Images
 - Migration
 - Gorilla Mux Routing
 - Gracefully Shutdown
+- MySQL Join Relations
+- Handlers, Services, Models
 
+### Warm-up
 First thing is creating a network for Docker with the following command.
 
 ```
