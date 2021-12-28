@@ -30,10 +30,10 @@ func main() {
 		}
 	}(db)
 
-	studentService := services.NewStudent(db)
-	studentHandler := handlers.NewStudent(studentService)
 	lectureService := services.NewLecture(db)
 	lectureHandler := handlers.NewLecture(lectureService)
+	studentService := services.NewStudent(db, lectureService)
+	studentHandler := handlers.NewStudent(studentService)
 
 	r := mux.NewRouter()
 	//specify endpoints, handler functions and HTTP method
@@ -43,6 +43,7 @@ func main() {
 	r.HandleFunc("/students", studentHandler.Insert).Methods("POST")
 	r.HandleFunc("/students/{id}", studentHandler.Update).Methods("PUT")
 	r.HandleFunc("/students/{id}", studentHandler.Delete).Methods("DELETE")
+	r.HandleFunc("/students/{id}/lectures", studentHandler.AttachLectures).Methods("POST")
 	r.HandleFunc("/lectures", lectureHandler.FetchAll).Methods("GET")
 	r.HandleFunc("/lectures/{id}", lectureHandler.FetchOne).Methods("GET")
 	r.HandleFunc("/lectures", lectureHandler.Insert).Methods("POST")

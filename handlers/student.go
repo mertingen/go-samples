@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
 )
 
@@ -67,7 +68,7 @@ func (s *Student) Delete(w http.ResponseWriter, r *http.Request) {
 	//specify HTTP status code
 	w.WriteHeader(http.StatusOK)
 
-	if (models.Student{}) == student {
+	if reflect.DeepEqual(student, models.Student{}) {
 		resp := make(map[string]string)
 		resp["error"] = "Student is not found!"
 
@@ -126,7 +127,7 @@ func (s *Student) FetchOne(w http.ResponseWriter, r *http.Request) {
 	//specify HTTP status code
 	w.WriteHeader(http.StatusOK)
 
-	if (models.Student{}) == student {
+	if reflect.DeepEqual(student, models.Student{}) {
 		resp := make(map[string]string)
 		resp["error"] = "Student is not found!"
 
@@ -179,7 +180,7 @@ func (s *Student) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	
+
 	if id != student.Id {
 		resp := make(map[string]string)
 		resp["error"] = "Ids are not matched!"
@@ -203,7 +204,7 @@ func (s *Student) Update(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	if (models.Student{}) == isExist {
+	if reflect.DeepEqual(isExist, models.Student{}) {
 		resp := make(map[string]string)
 		resp["error"] = "Student is not found!"
 
@@ -271,7 +272,7 @@ func (s *Student) Insert(w http.ResponseWriter, r *http.Request) {
 	//specify HTTP status code
 	w.WriteHeader(http.StatusOK)
 
-	if (models.Student{}) != isExist {
+	if !reflect.DeepEqual(isExist, models.Student{}) {
 		resp := make(map[string]string)
 		resp["error"] = "This e-mail is already taken!"
 
@@ -309,4 +310,77 @@ func (s *Student) Insert(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+func (s *Student) AttachLectures(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	strId := params["id"]
+
+	//it converts string to int64
+	id, err := strconv.ParseInt(strId, 10, 64)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	student, err := s.studentService.FetchOneById(id)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if reflect.DeepEqual(student, models.Student{}) {
+		resp := make(map[string]string)
+		resp["error"] = "Student is not found!"
+
+		//convert struct to JSON
+		jsonResponse, err := json.Marshal(resp)
+		if err != nil {
+			return
+		}
+
+		//update response
+		_, err = w.Write(jsonResponse)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	lectureIds := make([]int64, 0)
+
+	err = json.Unmarshal(body, &lectureIds)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = s.studentService.AttachLectures(student.Id, lectureIds)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	//update content type
+	w.Header().Set("Content-Type", "application/json")
+
+	//specify HTTP status code
+	w.WriteHeader(http.StatusOK)
+
+	resp := make(map[string]bool)
+	resp["status"] = true
+
+	//convert struct to JSON
+	jsonResponse, err := json.Marshal(resp)
+	if err != nil {
+		return
+	}
+
+	//update response
+	_, err = w.Write(jsonResponse)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 }

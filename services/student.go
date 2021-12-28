@@ -6,11 +6,12 @@ import (
 )
 
 type Student struct {
-	db *sql.DB
+	db             *sql.DB
+	lectureService Lecture
 }
 
-func NewStudent(db *sql.DB) Student {
-	return Student{db: db}
+func NewStudent(db *sql.DB, lectureService Lecture) Student {
+	return Student{db: db, lectureService: lectureService}
 }
 
 func (s *Student) Delete(id int64) error {
@@ -31,18 +32,33 @@ func (s *Student) Delete(id int64) error {
 
 func (s *Student) FetchAll() ([]models.Student, error) {
 	students := make([]models.Student, 0)
-	student := models.Student{}
-	rows, err := s.db.Query("SELECT * FROM students ORDER BY fullname")
+	rows, err := s.db.Query(`SELECT s.id, s.fullname, s.email, s.age, l.id, l.name  FROM students s
+									LEFT JOIN students_lectures sl ON sl.student_id = s.id
+									LEFT JOIN lectures l ON l.id = sl.lecture_id
+									ORDER BY s.fullname`)
 	if err != sql.ErrNoRows && err != nil {
 		return students, err
 	}
 	for rows.Next() {
-		err := rows.Scan(&student.Id,
+		student := models.Student{}
+		student.Lecture = make([]models.Lecture, 0)
+		var lectureId sql.NullInt64
+		var lectureName sql.NullString
+		lecture := models.Lecture{}
+		err := rows.Scan(
+			&student.Id,
 			&student.Fullname,
 			&student.Email,
-			&student.Age)
+			&student.Age,
+			&lectureId,
+			&lectureName)
 		if err != nil {
 			return students, err
+		}
+		if lectureId.Valid {
+			lecture.Id = lectureId.Int64
+			lecture.Name = lectureName.String
+			student.Lecture = append(student.Lecture, lecture)
 		}
 		students = append(students, student)
 	}
@@ -121,4 +137,33 @@ func (s *Student) Insert(data models.Student) (int64, error) {
 	}
 
 	return id, nil
+}
+
+func (s *Student) AttachLectures(studentId int64, lectureIds []int64) error {
+	//it's going to continue if there is an error
+	//there should be a proper way to fix this situation.
+	for _, id := range lectureIds {
+		isExistLecture, err := s.lectureService.FetchOneById(id)
+		if err != nil {
+			continue
+		}
+		if (models.Lecture{}) == isExistLecture {
+			continue
+		}
+
+		// perform a db.Query insert
+		stmt, err := s.db.Prepare("INSERT INTO students_lectures(student_id,lecture_id) VALUES (?, ?)")
+
+		// if there is an error inserting, handle it
+		if err != nil {
+			continue
+		}
+
+		_, err = stmt.Exec(studentId, id)
+		if err != nil {
+			continue
+		}
+		continue
+	}
+	return nil
 }
