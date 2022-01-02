@@ -85,9 +85,9 @@ docker build -t samples-crud .
 
 ```json
 {
-    "fullname": "bbb",
-    "email": "bbb",
-    "age": 5
+    "fullname": "Mert Simsek",
+    "email": "mertsmsk0@gmail.com",
+    "age": 18
 }
 ```
 
@@ -111,10 +111,10 @@ docker build -t samples-crud .
 
 ```json
 {
-    "id": 11,
-    "fullname": "zzzz",
-    "email": "sdfsdf",
-    "age": 123
+    "id": 1,
+    "fullname": "Mert Simsek",
+    "email": "mertsmsk0@gmail.com",
+    "age": 19
 }
 ```
 
@@ -145,7 +145,7 @@ docker build -t samples-crud .
 ### Body (**raw**)
 
 ```json
-[3,2]
+[1,2]
 ```
 
 
