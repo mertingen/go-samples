@@ -357,7 +357,7 @@ func (s *Student) AttachLectures(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	err = s.studentService.AttachLectures(student.Id, lectureIds)
+	err = s.studentService.AttachLectures(student, lectureIds)
 	if err != nil {
 		log.Fatalln(err)
 	}

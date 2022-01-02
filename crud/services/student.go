@@ -39,6 +39,8 @@ func (s *Student) FetchAll() ([]models.Student, error) {
 	if err != sql.ErrNoRows && err != nil {
 		return students, err
 	}
+
+	var sId int64
 	for rows.Next() {
 		student := models.Student{}
 		student.Lecture = make([]models.Lecture, 0)
@@ -58,26 +60,62 @@ func (s *Student) FetchAll() ([]models.Student, error) {
 		if lectureId.Valid {
 			lecture.Id = lectureId.Int64
 			lecture.Name = lectureName.String
-			student.Lecture = append(student.Lecture, lecture)
+			if sId == student.Id {
+				//if it's same student, it appends the lecture previous student that in the slice
+				//thus the same students will have their lectures.
+				lastIndex := len(students) - 1
+				students[lastIndex].Lecture = append(students[lastIndex].Lecture, lecture)
+			} else {
+				student.Lecture = append(student.Lecture, lecture)
+			}
 		}
-		students = append(students, student)
+		if sId != student.Id {
+			students = append(students, student)
+		}
+		sId = student.Id
+
 	}
 	return students, nil
 }
 
 func (s *Student) FetchOneById(id int64) (models.Student, error) {
 	student := models.Student{}
+	student.Lecture = make([]models.Lecture, 0)
 
-	err := s.db.QueryRow("SELECT * FROM students WHERE id=?", id).Scan(
-		&student.Id,
-		&student.Fullname,
-		&student.Email,
-		&student.Age)
+	rows, err := s.db.Query(`SELECT s.id, s.fullname, s.email, s.age, l.id, l.name  FROM students s
+									LEFT JOIN students_lectures sl ON sl.student_id = s.id
+									LEFT JOIN lectures l ON l.id = sl.lecture_id
+									WHERE s.id=?
+									ORDER BY s.fullname`, id)
+	if err != nil {
+		return student, err
+	}
 
 	//if there is no row, it shouldn't give an error
 	//thus "sql.ErrNoRows" is added
 	if err != sql.ErrNoRows && err != nil {
 		return student, err
+	}
+
+	for rows.Next() {
+		var lectureId sql.NullInt64
+		var lectureName sql.NullString
+		lecture := models.Lecture{}
+		err := rows.Scan(
+			&student.Id,
+			&student.Fullname,
+			&student.Email,
+			&student.Age,
+			&lectureId,
+			&lectureName)
+		if err != nil {
+			return student, err
+		}
+		if lectureId.Valid {
+			lecture.Id = lectureId.Int64
+			lecture.Name = lectureName.String
+			student.Lecture = append(student.Lecture, lecture)
+		}
 	}
 
 	return student, nil
@@ -139,7 +177,31 @@ func (s *Student) Insert(data models.Student) (int64, error) {
 	return id, nil
 }
 
-func (s *Student) AttachLectures(studentId int64, lectureIds []int64) error {
+func (s *Student) AttachLectures(student models.Student, lectureIds []int64) error {
+	for _, l := range student.Lecture {
+		willBeDeleted := true
+		for _, nl := range lectureIds {
+			if l.Id == nl {
+				willBeDeleted = false
+			}
+		}
+		if willBeDeleted == true {
+			// perform a db.Query insert
+			stmt, err := s.db.Prepare("DELETE FROM students_lectures WHERE student_id=? AND lecture_id=?")
+
+			// if there is an error inserting, handle it
+			if err != nil {
+				continue
+			}
+
+			_, err = stmt.Exec(student.Id, l.Id)
+			if err != nil {
+				continue
+			}
+			continue
+		}
+	}
+
 	//it's going to continue if there is an error
 	//there should be a proper way to fix this situation.
 	for _, id := range lectureIds {
@@ -151,19 +213,29 @@ func (s *Student) AttachLectures(studentId int64, lectureIds []int64) error {
 			continue
 		}
 
-		// perform a db.Query insert
-		stmt, err := s.db.Prepare("INSERT INTO students_lectures(student_id,lecture_id) VALUES (?, ?)")
-
-		// if there is an error inserting, handle it
-		if err != nil {
-			continue
+		//if this new id cannot match exist one, it'll be added as a new row.
+		willBeAdded := true
+		for _, l := range student.Lecture {
+			if l.Id == id {
+				willBeAdded = false
+			}
 		}
 
-		_, err = stmt.Exec(studentId, id)
-		if err != nil {
+		if willBeAdded == true {
+			// perform a db.Query insert
+			stmt, err := s.db.Prepare("INSERT INTO students_lectures(student_id,lecture_id) VALUES (?, ?)")
+
+			// if there is an error inserting, handle it
+			if err != nil {
+				continue
+			}
+
+			_, err = stmt.Exec(student.Id, id)
+			if err != nil {
+				continue
+			}
 			continue
 		}
-		continue
 	}
 	return nil
 }
