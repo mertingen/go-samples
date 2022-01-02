@@ -1,15 +1,12 @@
-# go-samples
-I'd like to share random apps in the spare times. Thus, I'm going to try learning some concepts of Go and as much as I can I try to clarify each line.
-
-## CRUD APP
+# Project: Anti-framework CRUD Go Web API
 It basically handles CRUD operations in Go. I find the following topics important. Thus, I can refer to this app to get a reference for them.
 
-- Dockerfiles, Containers and Images
-- Migration
-- Gorilla Mux Routing
-- Gracefully Shutdown
-- MySQL Join Relations
-- Handlers, Services, Models
+\- Dockerfiles, Containers and Images  
+\- Migration  
+\- Gorilla Mux Routing  
+\- Gracefully Shutdown  
+\- MySQL Join Relations  
+\- Handlers, Services, Models
 
 ### Warm-up
 First thing is creating a network for Docker with the following command.
@@ -73,3 +70,142 @@ docker build -t samples-crud .
      -e APP_PORT=8000 \
    samples-crud
  ```
+
+
+
+# 📁 Collection: Students 
+
+
+## End-point: insert-student
+### Method: POST
+>```
+>localhost:8000/students
+>```
+### Body (**raw**)
+
+```json
+{
+    "fullname": "bbb",
+    "email": "bbb",
+    "age": 5
+}
+```
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: fetch-one-student
+### Method: GET
+>```
+>localhost:8000/students/9
+>```
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: update-student
+### Method: PUT
+>```
+>localhost:8000/students/11
+>```
+### Body (**raw**)
+
+```json
+{
+    "id": 11,
+    "fullname": "zzzz",
+    "email": "sdfsdf",
+    "age": 123
+}
+```
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: delete-student
+### Method: DELETE
+>```
+>localhost:8000/students/10
+>```
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: fetch-all-students
+### Method: GET
+>```
+>localhost:8000/students
+>```
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: insert-lecture-to-student
+### Method: POST
+>```
+>localhost:8000/students/9/lectures
+>```
+### Body (**raw**)
+
+```json
+[3,2]
+```
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+# 📁 Collection: Lectures 
+
+
+## End-point: fetch-all-lectures
+### Method: GET
+>```
+>localhost:8000/lectures
+>```
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: insert-lecture
+### Method: POST
+>```
+>localhost:8000/lectures
+>```
+### Body (**raw**)
+
+```json
+{
+    "name": "biology"
+}
+```
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: update-lecture
+### Method: PUT
+>```
+>localhost:8000/lectures/1
+>```
+### Body (**raw**)
+
+```json
+{
+    "id": 1,
+    "name": "biology"
+}
+```
+
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: fetch-one-lecture
+### Method: GET
+>```
+>localhost:8000/lectures/1
+>```
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: delete-lecture
+### Method: DELETE
+>```
+>localhost:8000/lectures/1
+>```
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
