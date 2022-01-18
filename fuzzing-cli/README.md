@@ -3,6 +3,7 @@ It gets the following parameters and provides HTTP Get requests.
 Thus, it checks the response code. It will use **./assets/letter_wl.txt** as letter and word resource.
 
 **url:** wanted URL to be fuzzing with a parameter.
+
 **respCode:** wanted HTTP response code to understand expected case.
 
 ### Usage
