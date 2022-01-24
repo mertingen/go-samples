@@ -12,7 +12,7 @@ It basically handles CRUD operations in Go. I find the following topics importan
 First thing is creating a network for Docker with the following command.
 
 ```
-docker create network samples-crud
+docker network create samples-crud
 ```
 
 
