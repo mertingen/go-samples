@@ -24,7 +24,10 @@ func Connect() error {
 		log.Fatalln(err)
 	}
 
-	err = Database.AutoMigrate(&entities.Student{})
+	err = Database.AutoMigrate(
+		&entities.Student{},
+		&entities.Lecture{},
+	)
 	if err != nil {
 		log.Fatalln(err)
 	}

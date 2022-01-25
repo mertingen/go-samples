@@ -6,68 +6,68 @@ import (
 	"github.com/mertingen/go-samples/entities"
 )
 
-type studentResp struct {
+type lectureResp struct {
 	Status  bool               `json:"status"`
 	Message string             `json:"message"`
-	Data    []entities.Student `json:"data"`
+	Data    []entities.Lecture `json:"data"`
 }
 
-func GetStudents(c *fiber.Ctx) error {
-	rows := make([]entities.Student, 0)
+func GetLectures(c *fiber.Ctx) error {
+	rows := make([]entities.Lecture, 0)
 
 	result := config.Database.Find(&rows)
 
-	resp := studentResp{
+	resp := lectureResp{
 		Status:  true,
-		Message: "Students are found.",
+		Message: "Lectures are found.",
 		Data:    rows,
 	}
 	if result.RowsAffected == 0 {
 		resp.Status = false
-		resp.Message = "Students are not found."
+		resp.Message = "Lectures are not found."
 		return c.Status(200).JSON(resp)
 	}
 	return c.Status(200).JSON(resp)
 }
 
-func GetStudent(c *fiber.Ctx) error {
+func GetLecture(c *fiber.Ctx) error {
 	id := c.Params("id")
-	row := make([]entities.Student, 0)
+	row := make([]entities.Lecture, 0)
 
 	result := config.Database.Find(&row, id)
 
-	resp := studentResp{
+	resp := lectureResp{
 		Status:  true,
-		Message: "Student is found.",
+		Message: "Lecture is found.",
 		Data:    row,
 	}
 	if result.RowsAffected == 0 {
 		resp.Status = false
-		resp.Message = "Students is not found."
+		resp.Message = "Lecture is not found."
 		return c.Status(200).JSON(resp)
 	}
 
 	return c.Status(200).JSON(&resp)
 }
 
-func AddStudent(c *fiber.Ctx) error {
-	row := new(entities.Student)
+func AddLecture(c *fiber.Ctx) error {
+	row := new(entities.Lecture)
 
-	resp := studentResp{
+	resp := lectureResp{
 		Status:  true,
-		Message: "Student is created.",
-		Data:    make([]entities.Student, 0),
+		Message: "Lecture is created.",
+		Data:    make([]entities.Lecture, 0),
 	}
 	if err := c.BodyParser(row); err != nil {
 		resp.Status = false
-		resp.Message = "An error occurs while student is created."
+		resp.Message = "An error occurs while lecture is created."
 		return c.Status(200).JSON(resp)
 	}
 
 	result := config.Database.Create(&row)
 	if result.RowsAffected == 0 {
 		resp.Status = false
-		resp.Message = "An error occurs while student is created."
+		resp.Message = "An error occurs while lecture is created."
 		return c.Status(200).JSON(resp)
 	}
 
@@ -75,25 +75,25 @@ func AddStudent(c *fiber.Ctx) error {
 	return c.Status(201).JSON(resp)
 }
 
-func UpdateStudent(c *fiber.Ctx) error {
-	row := new(entities.Student)
+func UpdateLecture(c *fiber.Ctx) error {
+	row := new(entities.Lecture)
 	id := c.Params("id")
 
-	resp := studentResp{
+	resp := lectureResp{
 		Status:  true,
-		Message: "Student is updated.",
-		Data:    make([]entities.Student, 0),
+		Message: "Lecture is updated.",
+		Data:    make([]entities.Lecture, 0),
 	}
 	if err := c.BodyParser(row); err != nil {
 		resp.Status = false
-		resp.Message = "An error occurs while student is updated."
+		resp.Message = "An error occurs while lecture is updated."
 		return c.Status(200).JSON(resp)
 	}
 
 	result := config.Database.Where("id = ?", id).Updates(&row)
 	if result.RowsAffected == 0 {
 		resp.Status = false
-		resp.Message = "An error occurs while student is updated."
+		resp.Message = "An error occurs while lecture is updated."
 		return c.Status(200).JSON(resp)
 	}
 
@@ -101,20 +101,20 @@ func UpdateStudent(c *fiber.Ctx) error {
 	return c.Status(200).JSON(resp)
 }
 
-func RemoveStudent(c *fiber.Ctx) error {
+func RemoveLecture(c *fiber.Ctx) error {
 	id := c.Params("id")
-	var row entities.Student
+	var row entities.Lecture
 
-	resp := studentResp{
+	resp := lectureResp{
 		Status:  true,
-		Message: "Student is deleted.",
-		Data:    make([]entities.Student, 0),
+		Message: "Lecture is deleted.",
+		Data:    make([]entities.Lecture, 0),
 	}
 	result := config.Database.Delete(&row, id)
 
 	if result.RowsAffected == 0 {
 		resp.Status = false
-		resp.Message = "An error occurs while student is updated."
+		resp.Message = "An error occurs while lecture is updated."
 		return c.Status(200).JSON(resp)
 	}
 

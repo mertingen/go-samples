@@ -31,6 +31,11 @@ func main() {
 	app.Post("/students", handlers.AddStudent)
 	app.Put("/students/:id", handlers.UpdateStudent)
 	app.Delete("/students/:id", handlers.RemoveStudent)
+	app.Get("/lectures", handlers.GetLectures)
+	app.Get("/lectures/:id", handlers.GetLecture)
+	app.Post("/lectures", handlers.AddLecture)
+	app.Put("/lectures/:id", handlers.UpdateLecture)
+	app.Delete("/lectures/:id", handlers.RemoveLecture)
 
 	if err := app.Listen(fmt.Sprintf(":%s", os.Getenv("APP_PORT"))); err != nil {
 		log.Panic(err)
