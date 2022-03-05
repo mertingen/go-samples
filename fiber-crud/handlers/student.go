@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/mertingen/go-samples/config"
 	"github.com/mertingen/go-samples/entities"
+	"log"
 )
 
 type studentResp struct {
@@ -15,7 +17,7 @@ type studentResp struct {
 func GetStudents(c *fiber.Ctx) error {
 	rows := make([]entities.Student, 0)
 
-	result := config.Database.Find(&rows)
+	result := config.Database.Preload("Lectures").Find(&rows)
 
 	resp := studentResp{
 		Status:  true,
@@ -34,7 +36,7 @@ func GetStudent(c *fiber.Ctx) error {
 	id := c.Params("id")
 	row := make([]entities.Student, 0)
 
-	result := config.Database.Find(&row, id)
+	result := config.Database.Preload("Lectures").Find(&row, id)
 
 	resp := studentResp{
 		Status:  true,
@@ -119,4 +121,65 @@ func RemoveStudent(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(resp)
+}
+
+func AttachLectures(c *fiber.Ctx) error {
+	id := c.Params("id")
+	student := make([]entities.Student, 0)
+	lectures := make([]entities.Lecture, 0)
+
+	result := config.Database.Find(&student, id)
+
+	if result.RowsAffected == 0 {
+		resp := studentResp{
+			Status:  false,
+			Message: "Students are not found.",
+			Data:    student,
+		}
+		return c.Status(200).JSON(resp)
+	}
+
+	lectureIds := new([]uint)
+	if err := c.BodyParser(lectureIds); err != nil {
+		log.Println(err)
+		resp := studentResp{
+			Status:  false,
+			Message: "Lectures are not found.",
+			Data:    student,
+		}
+		return c.Status(200).JSON(resp)
+	}
+
+	if len(*lectureIds) > 0 {
+		err := config.Database.Where(lectureIds).Find(&lectures).Error
+		if err != nil {
+			log.Println(err)
+			resp := studentResp{
+				Status:  false,
+				Message: "Lectures are not found.",
+				Data:    student,
+			}
+			return c.Status(200).JSON(resp)
+		}
+	}
+
+	fmt.Println(lectures)
+	err := config.Database.Model(&student).Association("Lectures").Replace(lectures)
+	if err != nil {
+		log.Println(err)
+		resp := studentResp{
+			Status:  false,
+			Message: "An error occurs while student is updated.",
+			Data:    student,
+		}
+		return c.Status(200).JSON(resp)
+	}
+
+	resp := studentResp{
+		Status:  true,
+		Message: "Lectures are updated.",
+		Data:    student,
+	}
+	return c.Status(200).JSON(resp)
+
 }

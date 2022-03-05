@@ -31,6 +31,7 @@ func main() {
 	app.Post("/students", handlers.AddStudent)
 	app.Put("/students/:id", handlers.UpdateStudent)
 	app.Delete("/students/:id", handlers.RemoveStudent)
+	app.Post("/students/:id/lectures", handlers.AttachLectures)
 	app.Get("/lectures", handlers.GetLectures)
 	app.Get("/lectures/:id", handlers.GetLecture)
 	app.Post("/lectures", handlers.AddLecture)
