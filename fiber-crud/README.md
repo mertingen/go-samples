@@ -1,4 +1,4 @@
-# Project: Anti-framework CRUD Go Web API
+# Project: Fiber Framework CRUD Go Web API
 It basically handles CRUD operations in Go. I find the following topics important. Thus, I can refer to this app to get a reference for them.
 
 \- Dockerfiles, Containers and Images   
